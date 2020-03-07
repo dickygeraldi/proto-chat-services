@@ -60,7 +60,12 @@ func (s *chatServices) RegisterUsername(ctx context.Context, req *v1.RegisterUse
 	var code, message, status, token, registeredDate string
 
 	// Checking API Version
-	if err := s.CheckApi(req.Api); err != nil {
+
+	if req.Username == "" {
+		code = "01"
+		message = "Username harus diisi"
+		status = "Gagal registrasi"
+	} else if err := s.CheckApi(req.Api); err != nil {
 		return nil, err
 	} else {
 		code, status, message, token, registeredDate = models.RegisterAccount(req.Username)
