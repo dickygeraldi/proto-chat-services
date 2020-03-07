@@ -18,17 +18,9 @@ func init() {
 // Tokenization for JWT auth
 type Tokenization struct {
 	UserId   string
-	Password string
-	Time     string
-	Ip       string
 	Username string
+	Time     string
 	jwt.StandardClaims
-}
-
-// Struct message error
-type MessageError struct {
-	Code    string
-	Message string
 }
 
 // structure redis configuration
@@ -73,15 +65,4 @@ func getEnv(key string, defaultVal string) string {
 	}
 
 	return defaultVal
-}
-
-// func to set code and message validation
-func GetMessageError() map[int]MessageError {
-	dataError := make(map[int]MessageError)
-
-	dataError[00] = MessageError{"HV-00", "Processing Success"}
-	dataError[422] = MessageError{"HV-422", "Processing Data Error"}
-	dataError[01] = MessageError{"HV-001", "Processing pending, try again later"}
-
-	return dataError
 }

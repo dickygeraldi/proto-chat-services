@@ -11,7 +11,7 @@ import (
 
 	"log"
 	"net/http"
-	v1 "protoUserService/pkg/api/v1"
+	v1 "protoChatServices/pkg/api/v1"
 )
 
 // RunServer http/rest gateway
@@ -22,7 +22,7 @@ func RunServer(ctx context.Context, gRPCPort, httpPort string) error {
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	if err := v1.RegisterUserServicesHandlerFromEndpoint(ctx, mux, "localhost:"+gRPCPort, opts); err != nil {
+	if err := v1.RegisterChatServicesHandlerFromEndpoint(ctx, mux, "localhost:"+gRPCPort, opts); err != nil {
 		log.Fatalf("Failed to start HTTP gateway: %v", err)
 	}
 

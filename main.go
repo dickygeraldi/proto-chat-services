@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	cmd "protoUserService/pkg/cmd/server"
+	cmd "protoChatServices/pkg/cmd/server"
 )
 
 func main() {

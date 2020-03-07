@@ -8,13 +8,13 @@ import (
 
 	"fmt"
 	"net"
-	v1 "protoUserService/pkg/api/v1"
+	v1 "protoChatServices/pkg/api/v1"
 
 	"google.golang.org/grpc"
 )
 
 // Run server gRPC sevice to user service
-func RunServer(ctx context.Context, v1Api v1.UserServicesServer, port string) error {
+func RunServer(ctx context.Context, v1Api v1.ChatServicesServer, port string) error {
 	listen, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		fmt.Println(err)
@@ -22,7 +22,7 @@ func RunServer(ctx context.Context, v1Api v1.UserServicesServer, port string) er
 
 	// Register the service
 	server := grpc.NewServer()
-	v1.RegisterUserServicesServer(server, v1Api)
+	v1.RegisterChatServicesServer(server, v1Api)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

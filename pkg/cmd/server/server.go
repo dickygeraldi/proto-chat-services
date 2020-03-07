@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	grcp "protoUserService/pkg/protocol/grpc"
-	"protoUserService/pkg/protocol/rest"
-	"protoUserService/pkg/services/api/v1/controllers"
+	grcp "protoChatServices/pkg/protocol/grpc"
+	"protoChatServices/pkg/protocol/rest"
+	"protoChatServices/pkg/services/api/v1/controllers"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -45,7 +45,7 @@ func RunServer() error {
 
 	fmt.Println("Database Connected")
 
-	v1Api := controllers.NewUserServicesService(db)
+	v1Api := controllers.NewChatServicesService(db)
 
 	go func() {
 		_ = rest.RunServer(ctx, "7980", os.Getenv("PORT"))

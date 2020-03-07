@@ -1,32 +1,27 @@
 package models
 
 import (
-	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	crand "crypto/rand"
-	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"io"
 	"math/rand"
-	"protoUserService/pkg/services/api/v1/global"
+	"protoChatServices/pkg/services/api/v1/global"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/mergermarket/go-pkcs7"
-	"github.com/minio/highwayhash"
 )
 
 // Set global environment variable
 var conf *global.Configuration
-var messageError map[int]global.MessageError
 var level, cases, fatal string
 
 // Function initialization
 func init() {
 	conf = global.New()
-	messageError = global.GetMessageError()
 }
 
 // function to encrypt using AES 256
@@ -106,61 +101,26 @@ func JwtTokenCreate(token *global.Tokenization) (string, error) {
 }
 
 // Function for register account
-func RegisterAccount(ipAddress, numberPhone, username, fullname, password, timeRequest string, connection *sql.DB, ctx context.Context) (code, status, message, token, fullName string, isActive bool) {
-	var count int
+func RegisterAccount(username string) (code, status, message, token, registeredDate string) {
 
-	// check username
-	checkUsername := global.GenerateQueryForUser(map[string]string{
-		"username": username,
-	})
+	// Get data UserId
+	userId := getRandomString()
+	timeDate := time.Now().Format("2006-01-02 15:04:05")
 
-	rows := connection.QueryRowContext(ctx, checkUsername)
-
-	err := rows.Scan(&count)
-	if err != nil {
-		fmt.Println(err)
+	tokenJwt := &global.Tokenization{
+		UserId:   userId,
+		Time:     timeDate,
+		Username: username,
 	}
 
-	if count == 0 {
-		passwordHash := highwayhash.Sum([]byte(password), []byte(conf.KeyPass))
-		pass := hex.EncodeToString(passwordHash[:])
-		userId := getRandomString()
+	tokenAuth, _ := JwtTokenCreate(tokenJwt)
+	encrypted, _ := Encrypt(tokenAuth)
 
-		tokenJwt := &global.Tokenization{
-			UserId:   userId,
-			Password: pass,
-			Time:     timeRequest,
-			Ip:       ipAddress,
-			Username: username,
-		}
+	token = encrypted
+	registeredDate = timeDate
+	code = "00"
+	message = "Registered Account Success"
+	status = "Register Account Success"
 
-		tokenAuth, _ := JwtTokenCreate(tokenJwt)
-		encrypted, _ := Encrypt(tokenAuth)
-
-		token = encrypted
-
-		// go func() {
-		sql := `INSERT INTO "user" ("id", "username", "phoneNumber", "fullName", "token", "createdAt") VALUES ($1, $2, $3, $4, $5, $6)`
-
-		_, err := connection.Query(sql, userId, username, numberPhone, fullname, token, timeRequest)
-
-		if err != nil {
-			fmt.Println(err)
-		}
-		// }()
-
-		code = messageError[00].Code
-		message = messageError[00].Message
-		status = "Registration Success"
-		isActive = true
-	} else {
-		code = messageError[422].Code
-		message = messageError[422].Message
-		status = "Failed registration, username has been taken"
-		token = ""
-		fullName = fullname
-		isActive = false
-	}
-
-	return code, status, message, token, fullname, isActive
+	return code, status, message, token, registeredDate
 }

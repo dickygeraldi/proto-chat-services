@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"protoUserService/pkg/services/api/v1/logging"
+	"protoChatServices/pkg/services/api/v1/logging"
 	"regexp"
 )
 

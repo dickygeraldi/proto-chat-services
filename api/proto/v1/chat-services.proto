@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+    info: {
+        title: "chat-services";
+        version: "1.0";
+        contact: {
+            name: "user-services";
+            url: "https://github.com/dickygeraldi/proto-chat-services";
+            email: "dickygeraldi@gmail.com";
+        };
+    };
+    
+    schemes: HTTP;
+    consumes: "application/json";
+    produces: "application/json";
+    responses: {
+		key: "404";
+		value: {
+			description: "Returned when the resource does not exist.";
+			schema: {
+				json_schema: {
+					type: STRING;
+				}
+			}
+		}
+	}
+};
+
+message RegisterUsernameRequest {
+    string api = 1;
+    string username = 2;
+}
+
+message RegisterUsernameResponse {
+    string code = 1;
+    string status = 2;
+    string message = 3;
+    DataResponseRegistration data = 4;
+}
+
+message DataResponseRegistration {
+    string token = 1;
+    string loggedTime = 2;
+}
+
+message RequestChat {
+    string sender = 1;
+    string who = 2;
+    string message = 3;
+}
+
+message ResponseChat {
+    string code = 1;
+    string status = 2;
+    string message = 3;
+    DataResponseChat data = 4;
+}
+
+message DataResponseChat {
+    string username = 1;
+    string messageStatus = 2;
+    string messageTime = 3;
+}
+
+service ChatServices {
+    rpc RegisterUsername(RegisterUsernameRequest) returns (RegisterUsernameResponse) {
+        option(google.api.http) = {
+            post: "/v1/chat-services/register-account"
+            body: "*"
+        };
+    }
+
+    rpc SendingMessage(RequestChat) returns (ResponseChat) {
+        option(google.api.http) = {
+            post: "/v1/chat-services/sending-message"
+            body: "*"
+        };
+    }
+}
